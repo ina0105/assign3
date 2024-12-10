@@ -99,15 +99,20 @@ class CNNDecoder(nn.Module):
         #######################
         # PUT YOUR CODE HERE  #
         #######################
-        self.fc = nn.Linear(z_dim, num_filters * 7 * 7)
-        self.conv_layers = nn.Sequential(
-            nn.Conv2d(num_filters, num_filters, kernel_size=5, stride=1, padding=2),
+        self.linear = nn.Sequential(
+            nn.Linear(z_dim, 2*16*num_filters),
+            nn.ReLU()
+        )
+        self.net = nn.Sequential(
+            nn.ConvTranspose2d(2*num_filters, 2*num_filters, kernel_size=3, output_padding=1, padding=1, stride=2), # 4x4 => 8x8
             nn.ReLU(),
-            nn.Upsample(scale_factor=2),
-            nn.Conv2d(num_filters, num_filters, kernel_size=5, stride=1, padding=2),
+            nn.Conv2d(2*num_filters, 2*num_filters, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.Upsample(scale_factor=2),
-            nn.Conv2d(num_filters, num_input_channels, kernel_size=5, stride=1, padding=2),
+            nn.ConvTranspose2d(2*num_filters, num_filters, kernel_size=3, output_padding=1, padding=1, stride=2), # 8x8 => 16x16
+            nn.ReLU(),
+            nn.Conv2d(num_filters, num_filters, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(num_filters, num_input_channels, kernel_size=3, output_padding=1, padding=1, stride=2), # 16x16 => 32x32
         )
 
         #######################
