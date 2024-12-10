@@ -134,7 +134,7 @@ class CNNDecoder(nn.Module):
         #######################
         x = self.linear(z)
         x = x.view(x.size(0), -1, 7, 7)
-        x = self.conv_layers(x)       
+        x = self.net(x)       
         #######################
         # END OF YOUR CODE    #
         #######################
