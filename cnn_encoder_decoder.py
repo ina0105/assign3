@@ -104,15 +104,15 @@ class CNNDecoder(nn.Module):
             nn.ReLU()
         )
         self.net = nn.Sequential(
-            nn.ConvTranspose2d(2*num_filters, 2*num_filters, kernel_size=3, output_padding=1, padding=1, stride=2), # 4x4 => 8x8
+            nn.ConvTranspose2d(2*num_filters, 2*num_filters, kernel_size=3, output_padding=0, padding=1, stride=2),  
             nn.ReLU(),
             nn.Conv2d(2*num_filters, 2*num_filters, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(2*num_filters, num_filters, kernel_size=3, output_padding=1, padding=1, stride=2), # 8x8 => 16x16
+            nn.ConvTranspose2d(2*num_filters, num_filters, kernel_size=3, output_padding=1, padding=1, stride=2), 
             nn.ReLU(),
             nn.Conv2d(num_filters, num_filters, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(num_filters, num_input_channels, kernel_size=3, output_padding=1, padding=1, stride=2), # 16x16 => 32x32
+            nn.ConvTranspose2d(num_filters, num_input_channels, kernel_size=3, output_padding=1, padding=1, stride=2),  # 16x16 -> 28x28
         )
 
         #######################
@@ -133,8 +133,9 @@ class CNNDecoder(nn.Module):
         # PUT YOUR CODE HERE  #
         #######################
         x = self.linear(z)
-        x = x.view(x.size(0), -1, 4, 4)
-        x = self.net(x)       
+        x = x.reshape(x.shape[0], -1, 4, 4)
+        x = self.net(x)
+  
         #######################
         # END OF YOUR CODE    #
         #######################
