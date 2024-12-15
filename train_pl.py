@@ -72,10 +72,13 @@ class VAE(pl.LightningModule):
         # PUT YOUR CODE HERE  #
         #######################
         mu, logvar = self.encoder(imgs)
-        z = sample_reparameterize(mu, torch.exp(0.5 * logvar))
+        var=torch.exp(logvar)
+        z = sample_reparameterize(mu,  var)
         recon_logits = self.decoder(z)
         target = imgs.squeeze(1).long()
-        L_rec = F.cross_entropy(recon_logits.view(-1, 16), imgs.view(-1), reduction='none').view(imgs.shape[0], -1).sum(axis=1).mean()
+        recon_logits = recon_logits.permute(0, 2, 3, 1)
+        recon_logits = recon_logits.reshape(-1, 16)  
+        L_rec = F.cross_entropy(recon_logits, target.view(-1), reduction='none').view(imgs.shape[0], -1).sum(axis=1).mean()
         L_reg = KLD(mu, logvar).mean()
         elbo = L_rec + L_reg
         bpd = elbo_to_bpd(elbo, imgs.shape)

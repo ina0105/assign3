@@ -49,10 +49,9 @@ class CNNEncoder(nn.Module):
             nn.ReLU(),
             nn.Conv2d(2 * num_filters, 2 * num_filters, kernel_size=3, padding=1, stride=2),  
             nn.ReLU(),
+            nn.Flatten(), 
+            nn.Linear(2*16*num_filters, 2*z_dim)
         )
-        self.flattened_size = 2 * num_filters * 4 * 4
-        self.fc_mean = nn.Linear(self.flattened_size, z_dim)
-        self.fc_log_std = nn.Linear(self.flattened_size, z_dim)
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -71,9 +70,7 @@ class CNNEncoder(nn.Module):
         # PUT YOUR CODE HERE  #
         #######################
         x = self.conv_layers(x)
-        x = x.view(x.size(0), -1)
-        mean = self.fc_mean(x)
-        log_std = self.fc_log_std(x)
+        mean,log_std=torch.chunk(x,2,dim=1)
         #######################
         # END OF YOUR CODE    #
         #######################
@@ -133,7 +130,7 @@ class CNNDecoder(nn.Module):
         # PUT YOUR CODE HERE  #
         #######################
         x = self.linear(z)
-        x = x.reshape(x.shape[0], -1, 4, 4)
+        x = x.reshape(z.shape[0], -1, 4, 4)
         x = self.net(x)
   
         #######################
